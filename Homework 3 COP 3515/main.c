@@ -70,19 +70,77 @@ int hammingEncoder(int asciiVal)
 
   int hammingBin[11] = {binVal[0], binVal[1], binVal[2], -1, binVal[3], binVal[4], binVal[5], -1, binVal[6], -1, -1};
 
-  int p1;
-  int p2;
-  int p4;
-  int p8;
+  int p1Array[5] = {hammingBin[8], hammingBin[6], hammingBin[4], hammingBin[2], hammingBin[0]};
+  int p2Array[5] = {hammingBin[8], hammingBin[5], hammingBin[4], hammingBin[1], hammingBin[0]};
+  int p4Array[3] = {hammingBin[6], hammingBin[5], hammingBin[4]};
+  int p8Array[5] = {hammingBin[2], hammingBin[1], hammingBin[0]};
 
-  return 1;
+  if (hasEvenParity(p1Array, 5, 0))
+  {
+    hammingBin[10] = 0;
+  }
+  else
+  {
+    hammingBin[10] = 1;
+  }
+
+  if (hasEvenParity(p2Array, 5, 0))
+  {
+    hammingBin[9] = 0;
+  }
+  else
+  {
+    hammingBin[9] = 1;
+  }
+
+  if (hasEvenParity(p4Array, 3, 0))
+  {
+    hammingBin[7] = 0;
+  }
+  else
+  {
+    hammingBin[7] = 1;
+  }
+
+  if (hasEvenParity(p8Array, 3, 0))
+  {
+    hammingBin[3] = 0;
+  }
+  else
+  {
+    hammingBin[3] = 1;
+  }
+
+  hammingCode = binArrayToDec(hammingBin, sizeof(hammingBin) / sizeof(int));
+
+  return hammingCode;
 }
 
 int main(void)
 {
-  int ascii = 84;
-  int bin[8];
-  hammingEncoder(ascii);
+
+  FILE *fileToEncode = fopen("Homework #3 - Encoding.txt", "r");
+  FILE *fileToDecode = fopen("Homework #3 - Decoding.txt", "r");
+
+  if (fileToEncode == NULL)
+  {
+    printf("Couldn't open Homework #3 - Encoding.txt");
+    return 1;
+  }
+  if (fileToDecode == NULL)
+  {
+    printf("Couldn't open Homework #3 - Encoding.txt");
+    return 2;
+  }
+  
+  
+
+
+  printf("==> Starting the encoding process:\n\n\n");
+
+
+  fclose(fileToEncode);
+  fclose(fileToEncode);
 
   return 0;
 } /* main */

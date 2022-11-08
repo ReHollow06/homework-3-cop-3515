@@ -15,6 +15,28 @@
 int hammingEncoder(int asciiVal);
 void decToBinArray(int dataVal, int *binArray, int binArraySize);
 int binArrayToDec(int *binArray, int binArraySize);
+bool hasEvenParity(int *binArray, int binArraySize, int parityBit);
+
+bool hasEvenParity(int *binArray, int binArraySize, int parityBit)
+{
+  int numOnes = parityBit;
+  for (int i = 0; i < binArraySize; i++)
+  {
+    if (binArray[i] == 1)
+    {
+      numOnes++;
+    }
+  }
+
+  if (numOnes % 2 == 0)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
 
 void decToBinArray(int dataVal, int *binArray, int binArraySize)
 {
@@ -35,17 +57,16 @@ int binArrayToDec(int *binArray, int binArraySize)
   int decVal = 0;
   for (int i = 0; i < binArraySize; i++)
   {
-    decVal += (int) pow(2, i) * binArray[(binArraySize-1) - i];
+    decVal += (int)pow(2, i) * binArray[(binArraySize - 1) - i];
   }
   return decVal;
 }
-
 
 int hammingEncoder(int asciiVal)
 {
   int hammingCode;
   int binVal[7];
-  decToBinArray(asciiVal, binVal, sizeof(binVal)/sizeof(int));
+  decToBinArray(asciiVal, binVal, sizeof(binVal) / sizeof(int));
 
   int hammingBin[11] = {binVal[0], binVal[1], binVal[2], -1, binVal[3], binVal[4], binVal[5], -1, binVal[6], -1, -1};
 
@@ -53,7 +74,6 @@ int hammingEncoder(int asciiVal)
   int p2;
   int p4;
   int p8;
-
 
   return 1;
 }
@@ -63,7 +83,6 @@ int main(void)
   int ascii = 84;
   int bin[8];
   hammingEncoder(ascii);
-  
 
   return 0;
 } /* main */

@@ -203,7 +203,7 @@ int main(void)
   }
 
   fclose(fileToEncode);
-  fclose(fileToEncode);
+  fclose(fileToDecode);
 
   return 0;
 } /* main */

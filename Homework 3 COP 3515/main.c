@@ -16,6 +16,24 @@ int hammingEncoder(int asciiVal);
 void decToBinArray(int dataVal, int *binArray, int binArraySize);
 int binArrayToDec(int *binArray, int binArraySize);
 bool hasEvenParity(int *binArray, int binArraySize, int parityBit);
+void fillIntArray(int *intArray, int arraySize, int val);
+void arrayOutFormatted(int *numArray, int size, const char *stringFormat);
+
+void fillIntArray(int *intArray, int arraySize, int val)
+{
+  for (int i = 0; i < arraySize; i++)
+  {
+    intArray[i] = val;
+  }
+}
+
+void arrayOutFormatted(int *numArray, int size, const char *stringFormat)
+{
+  for (int i = 0; i < size; i++)
+  {
+    printf(stringFormat, numArray[i]);
+  }
+}
 
 bool hasEvenParity(int *binArray, int binArraySize, int parityBit)
 {
@@ -132,12 +150,57 @@ int main(void)
     printf("Couldn't open Homework #3 - Encoding.txt");
     return 2;
   }
-  
-  
-
 
   printf("==> Starting the encoding process:\n\n\n");
+  char lineCheck[100];
+  while (!feof(fileToEncode))
+  {
+    char line[100];
+    if (strcmp(line, lineCheck) == 0)
+    {
+      continue;
+    }
+    strcpy(lineCheck, line);
+    fgets(line, sizeof(line) / sizeof(line[0]), fileToEncode);
+    int hammingCodes[sizeof(line)];
+    int hammingCodesSize = sizeof(line);
+    fillIntArray(hammingCodes, hammingCodesSize, -1);
 
+    printf("Processing: %s\n", line);
+    for (int i = 0; i < strlen(line); i++) // prints out character and associated hammingcode, and adds hamming code to an array
+    {
+      if (line[i] == '\n')
+      {
+        continue;
+      }
+      
+      printf("Character = '%c' - %d\n", line[i], hammingEncoder((int)line[i]));
+      hammingCodes[i] = hammingEncoder((int)line[i]);
+    }
+
+    printf("Hamming Code: \n");
+
+    for (int i = 0; i < hammingCodesSize; i++) // prints out hamming codes with 3 codes per line
+    {
+      if (hammingCodes[i] != -1)
+      {
+        int hammingBin[16];
+        decToBinArray(hammingCodes[i], hammingBin, 16);
+        printf("%5d ", hammingCodes[i]);
+        arrayOutFormatted(hammingBin, 16, "%d");
+        if ((i + 1) % 3 == 0)
+        {
+          printf("\n");
+        }
+      }
+      else
+      {
+        continue;
+      }
+    }
+
+    printf("\n\n");
+  }
 
   fclose(fileToEncode);
   fclose(fileToEncode);

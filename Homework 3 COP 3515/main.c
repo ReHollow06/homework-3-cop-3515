@@ -18,6 +18,7 @@ int binArrayToDec(int *binArray, int binArraySize);
 bool hasEvenParity(int *binArray, int binArraySize, int parityBit);
 void fillIntArray(int *intArray, int arraySize, int val);
 void arrayOutFormatted(int *numArray, int size, const char *stringFormat);
+char hammingDecoder(int hammingCode);
 
 void fillIntArray(int *intArray, int arraySize, int val)
 {
@@ -134,6 +135,93 @@ int hammingEncoder(int asciiVal)
   return hammingCode;
 }
 
+
+char hammingDecoder(int hammingCode)
+{
+    int hammingBin[11];
+    decToBinArray(hammingCode, hammingBin, 11);
+    int p1;
+    int p2;
+    int p4;
+    int p8;
+    int errorIndex;
+    int p1Array[5] = {hammingBin[8], hammingBin[6], hammingBin[4], hammingBin[2], hammingBin[0]};
+    int p2Array[5] = {hammingBin[8], hammingBin[5], hammingBin[4], hammingBin[1], hammingBin[0]};
+    int p4Array[3] = {hammingBin[6], hammingBin[5], hammingBin[4]};
+    int p8Array[5] = {hammingBin[2], hammingBin[1], hammingBin[0]};
+
+    if (hasEvenParity(p1Array, 5, hammingBin[10]))
+    {
+        p1 = 0;
+    }
+    else
+    {
+        p1 = 1;
+    }
+
+    if (hasEvenParity(p2Array, 5, hammingBin[9]))
+    {
+        p2 = 0;
+    }
+    else
+    {
+        p2 = 1;
+    }
+
+    if (hasEvenParity(p4Array, 3, hammingBin[7]))
+    {
+        p4 = 0;
+    }
+    else
+    {
+        p4 = 1;
+    }
+
+    if (hasEvenParity(p8Array, 3, hammingBin[3]))
+    {
+        p8 = 0;
+    }
+    else
+    {
+        p8 = 1;
+    }
+    int pBitArray[4] = {p8, p4, p2, p1};
+    errorIndex = binArrayToDec(pBitArray, 4);
+
+    if (errorIndex == 0)
+    {
+        int asciiValBin[7] = {hammingBin[0], hammingBin[1], hammingBin[2], hammingBin[4], hammingBin[5], hammingBin[6], hammingBin[8]};
+        int asciiVal = binArrayToDec(asciiValBin, 7);
+        printf("Done processing %d\n", hammingCode);
+        printf("No transmission errors found in %d\n", hammingCode);
+        return (char)asciiVal;
+    }
+    else
+    {
+        int arrayErrorIndex = (sizeof(hammingBin) / sizeof(hammingBin[0])) - errorIndex;
+        int displayHammondCode[16];
+        decToBinArray(hammingCode, displayHammondCode, 16);
+        printf("Done processing %d\n", hammingCode);
+        printf("Error in bit position: %d\n", errorIndex);
+        printf("Token: %d, ", hammingCode);
+        arrayOutFormatted(displayHammondCode, 16, "%d");
+        printf("\n");
+        hammingBin[arrayErrorIndex] += 1;
+        if (hammingBin[arrayErrorIndex] == 2)
+        {
+            hammingBin[arrayErrorIndex] = 0;
+        }
+        int correctedHammingCode = binArrayToDec(hammingBin, 11);
+        decToBinArray(correctedHammingCode, displayHammondCode, 16);
+        printf("Corrected Token: %d, ", correctedHammingCode);
+        arrayOutFormatted(displayHammondCode, 16, "%d");
+        printf("\n");
+        int asciiValBin[7] = {hammingBin[0], hammingBin[1], hammingBin[2], hammingBin[4], hammingBin[5], hammingBin[6], hammingBin[8]};
+        int asciiVal = binArrayToDec(asciiValBin, 7);
+        return (char)asciiVal;
+    }
+}
+
 int main(void)
 {
 
@@ -151,56 +239,61 @@ int main(void)
     return 2;
   }
 
-  printf("==> Starting the encoding process:\n\n\n");
-  char lineCheck[100];
-  while (!feof(fileToEncode))
-  {
-    char line[100];
-    if (strcmp(line, lineCheck) == 0)
-    {
-      continue;
-    }
-    strcpy(lineCheck, line);
-    fgets(line, sizeof(line) / sizeof(line[0]), fileToEncode);
-    int hammingCodes[sizeof(line)];
-    int hammingCodesSize = sizeof(line);
-    fillIntArray(hammingCodes, hammingCodesSize, -1);
+  // printf("==> Starting the encoding process:\n\n\n");
+  // char lineCheck[100];
+  // while (!feof(fileToEncode))
+  // {
+  //   char line[100];
+  //   if (strcmp(line, lineCheck) == 0)
+  //   {
+  //     continue;
+  //   }
+  //   strcpy(lineCheck, line);
+  //   fgets(line, sizeof(line) / sizeof(line[0]), fileToEncode);
+  //   int hammingCodes[sizeof(line)];
+  //   int hammingCodesSize = sizeof(line);
+  //   fillIntArray(hammingCodes, hammingCodesSize, -1);
 
-    printf("Processing: %s\n", line);
-    for (int i = 0; i < strlen(line); i++) // prints out character and associated hammingcode, and adds hamming code to an array
-    {
-      if (line[i] == '\n')
-      {
-        continue;
-      }
-      
-      printf("Character = '%c' - %d\n", line[i], hammingEncoder((int)line[i]));
-      hammingCodes[i] = hammingEncoder((int)line[i]);
-    }
+  //   printf("Processing: %s\n", line);
+  //   for (int i = 0; i < strlen(line); i++) // prints out character and associated hammingcode, and adds hamming code to an array
+  //   {
+  //     if (line[i] == '\n')
+  //     {
+  //       continue;
+  //     }
 
-    printf("Hamming Code: \n");
+  //     printf("Character = '%c' - %d\n", line[i], hammingEncoder((int)line[i]));
+  //     hammingCodes[i] = hammingEncoder((int)line[i]);
+  //   }
 
-    for (int i = 0; i < hammingCodesSize; i++) // prints out hamming codes with 3 codes per line
-    {
-      if (hammingCodes[i] != -1)
-      {
-        int hammingBin[16];
-        decToBinArray(hammingCodes[i], hammingBin, 16);
-        printf("%5d ", hammingCodes[i]);
-        arrayOutFormatted(hammingBin, 16, "%d");
-        if ((i + 1) % 3 == 0)
-        {
-          printf("\n");
-        }
-      }
-      else
-      {
-        continue;
-      }
-    }
+  //   printf("Hamming Code: \n");
 
-    printf("\n\n");
-  }
+  //   for (int i = 0; i < hammingCodesSize; i++) // prints out hamming codes with 3 codes per line
+  //   {
+  //     if (hammingCodes[i] != -1)
+  //     {
+  //       int hammingBin[16];
+  //       decToBinArray(hammingCodes[i], hammingBin, 16);
+  //       printf("%5d ", hammingCodes[i]);
+  //       arrayOutFormatted(hammingBin, 16, "%d");
+  //       if ((i + 1) % 3 == 0)
+  //       {
+  //         printf("\n");
+  //       }
+  //     }
+  //     else
+  //     {
+  //       continue;
+  //     }
+  //   }
+
+  //   printf("\n\n");
+  // }
+
+  printf("==> Starting the decoding process: \n\n\n");
+  int lineNums[3];
+  fscanf(fileToDecode, "%7d%8d%8d ", &lineNums[0], &lineNums[1], &lineNums[2]);
+  arrayOutFormatted(lineNums, 3, "%d ");
 
   fclose(fileToEncode);
   fclose(fileToDecode);
